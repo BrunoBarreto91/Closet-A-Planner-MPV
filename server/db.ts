@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc, gte, lte, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, tasks, taskLogs, Task, InsertTask, TaskLog, InsertTaskLog } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,160 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Task queries
+export async function createTask(userId: number, task: Omit<InsertTask, 'userId'>): Promise<Task | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create task: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(tasks).values({
+      ...task,
+      userId,
+    });
+    const taskId = result[0].insertId;
+    const createdTask = await db.select().from(tasks).where(eq(tasks.id, Number(taskId))).limit(1);
+    return createdTask.length > 0 ? createdTask[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to create task:", error);
+    throw error;
+  }
+}
+
+export async function getTasksByUserId(userId: number, filters?: {
+  status?: string;
+  frente?: string;
+  canal?: string;
+  prazoStart?: Date;
+  prazoEnd?: Date;
+}): Promise<Task[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get tasks: database not available");
+    return [];
+  }
+
+  try {
+    let query = db.select().from(tasks).where(eq(tasks.userId, userId));
+
+    const conditions = [eq(tasks.userId, userId)];
+    
+    if (filters?.status) {
+      conditions.push(eq(tasks.status, filters.status as any));
+    }
+    if (filters?.frente) {
+      conditions.push(eq(tasks.frente, filters.frente as any));
+    }
+    if (filters?.canal) {
+      conditions.push(eq(tasks.canal, filters.canal as any));
+    }
+    if (filters?.prazoStart && filters?.prazoEnd) {
+      conditions.push(and(
+        gte(tasks.prazo, filters.prazoStart),
+        lte(tasks.prazo, filters.prazoEnd)
+      ) as any);
+    }
+
+    const result = await db.select().from(tasks).where(and(...conditions) as any);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get tasks:", error);
+    throw error;
+  }
+}
+
+export async function getTaskById(taskId: number, userId: number): Promise<Task | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get task: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.select().from(tasks).where(
+      and(eq(tasks.id, taskId), eq(tasks.userId, userId)) as any
+    ).limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to get task:", error);
+    throw error;
+  }
+}
+
+export async function updateTask(taskId: number, userId: number, updates: Partial<InsertTask>): Promise<Task | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update task: database not available");
+    return null;
+  }
+
+  try {
+    const task = await getTaskById(taskId, userId);
+    if (!task) return null;
+
+    // Log status change if status is being updated
+    if (updates.status && updates.status !== task.status) {
+      await db.insert(taskLogs).values({
+        taskId,
+        userId,
+        statusAnterior: task.status as any,
+        statusNovo: updates.status as any,
+        mudanca: `Status changed from ${task.status} to ${updates.status}`,
+      });
+    }
+
+    await db.update(tasks)
+      .set({
+        ...updates,
+        atualizadoEm: new Date(),
+      })
+      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)) as any);
+
+    const updatedTask = await getTaskById(taskId, userId);
+    return updatedTask;
+  } catch (error) {
+    console.error("[Database] Failed to update task:", error);
+    throw error;
+  }
+}
+
+export async function deleteTask(taskId: number, userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete task: database not available");
+    return false;
+  }
+
+  try {
+    const task = await getTaskById(taskId, userId);
+    if (!task) return false;
+
+    await db.delete(tasks).where(
+      and(eq(tasks.id, taskId), eq(tasks.userId, userId)) as any
+    );
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete task:", error);
+    throw error;
+  }
+}
+
+export async function getTaskLogs(taskId: number, userId: number): Promise<TaskLog[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get task logs: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db.select().from(taskLogs)
+      .where(and(eq(taskLogs.taskId, taskId), eq(taskLogs.userId, userId)) as any)
+      .orderBy(desc(taskLogs.criadoEm));
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to get task logs:", error);
+    throw error;
+  }
+}
