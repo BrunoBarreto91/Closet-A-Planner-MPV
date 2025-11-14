@@ -26,20 +26,20 @@
 
 ## Visualizações (Views)
 
-- [ ] Implementar **Kanban Principal** (colunas: To Do, Doing, Blocked, Done)
-  - [ ] Drag-and-drop entre status
-  - [ ] Agrupamento opcional por Frente
-  - [ ] Contador de tarefas por coluna
-- [ ] Implementar **Lista por Prazo** (ordenação por data, filtros rápidos: Hoje, Amanhã, Esta Semana)
-- [ ] Implementar **Mobile Rápido** (visão otimizada para celular)
+- [x] Implementar **Kanban Principal** (colunas: To Do, Doing, Blocked, Done)
+  - [x] Drag-and-drop entre status
+  - [x] Agrupamento opcional por Frente
+  - [x] Contador de tarefas por coluna
+- [x] Implementar **Lista por Prazo** (ordenação por data, filtros rápidos: Hoje, Amanhã, Esta Semana)
+- [x] Implementar **Mobile Rápido** (visão otimizada para celular com FAB)
 - [ ] Implementar **Lista de Bloqueadores** (agrupa tarefas bloqueadas)
 
 ## Alerta de Carga Cognitiva
 
-- [ ] Criar função `calculateCognitiveLoad(tasks: Task[])` (Baixo=1, Médio=2, Alto=3, +1 se Alta prioridade)
-- [ ] Implementar lógica: se carga > 10 pontos → alerta visual (banner amarelo)
+- [x] Criar função `calculateCognitiveLoad(tasks: Task[])` (Baixo=1, Médio=2, Alto=3, +1 se Alta prioridade)
+- [x] Implementar lógica: se carga > 10 pontos → alerta visual (banner amarelo)
 - [ ] Implementar sugestão de redistribuição via IA (mover 2-3 tarefas não-críticas)
-- [ ] Tornar threshold parametrizável (default 10, sem limitar WIP)
+- [x] Tornar threshold parametrizável (default 10, sem limitar WIP)
 
 ## Rotinas Automáticas
 
@@ -70,19 +70,19 @@
 
 ## Exportação de Dados
 
-- [ ] Implementar export CSV (todas as tarefas + campos meta)
-- [ ] Implementar export JSON (todas as tarefas + campos meta)
-- [ ] Botão "Exportar Dados" no menu principal
+- [x] Implementar export CSV (todas as tarefas + campos meta)
+- [x] Implementar export JSON (todas as tarefas + campos meta)
+- [x] Botão "Exportar Dados" no menu principal
 - [ ] Backup automático semanal (salvo no storage do Manus)
 
 ## Design & UX
 
-- [ ] Implementar paleta Quiet Luxury (Bege #F5F1E8, Cinza #D4CEBE, Verde menta #9FADA7, Amarelo #FDE68A, Vermelho #FCA5A5)
-- [ ] Implementar tipografia mobile-first (mín. 16px corpo, 20px+ títulos)
-- [ ] Implementar componentes reutilizáveis (cards, FAB "+", modal preview)
-- [ ] Garantir acessibilidade (botões grandes, foco de teclado, fontes legíveis)
-- [ ] Otimizar para mobile (80% do uso será celular)
-- [ ] Performance: carregamento <2s
+- [x] Implementar paleta Quiet Luxury (Bege #F5F1E8, Cinza #D4CEBE, Verde menta #9FADA7, Amarelo #FDE68A, Vermelho #FCA5A5)
+- [x] Implementar tipografia mobile-first (mín. 16px corpo, 20px+ títulos)
+- [x] Implementar componentes reutilizáveis (cards, FAB "+", modal preview)
+- [x] Garantir acessibilidade (botões grandes, foco de teclado, fontes legíveis)
+- [x] Otimizar para mobile (80% do uso será celular)
+- [x] Performance: carregamento <2s
 
 ## Documentação
 
