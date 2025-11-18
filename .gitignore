@@ -105,3 +105,13 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Project specific
+test-parser.ts
+seed-tasks.ts
+seed-tasks.mjs
+
+# Drizzle migrations (keep only schema)
+drizzle/**/*.sql
+drizzle/**/*.json
+!drizzle/schema.ts

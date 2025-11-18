@@ -116,3 +116,6 @@
 ## Bugs Reportados
 
 - [x] Corrigir funcionalidade de Linguagem Natural - aparece mensagem genérica "erro de parsing"
+
+- [ ] Configurar CI/CD com GitHub Actions
+- [ ] Fazer push do código para o repositório GitHub conectado
